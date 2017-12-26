@@ -14,7 +14,7 @@ def get_rcnn_names():
     pred = ['rcnn_cls_prob', 'rcnn_bbox_loss']
     label = ['rcnn_label', 'rcnn_bbox_target', 'rcnn_bbox_weight']
     if config.TRAIN.END2END:
-        pred.append('mask_prob')
+        # pred.append('mask_prob')
         pred.append('rcnn_label')
         pred.append('keypoints_label')
         rpn_pred, rpn_label = get_rpn_names()

@@ -146,9 +146,10 @@ def train_net(args, ctx, pretrained, epoch, prefix, begin_epoch, end_epoch,
     eval_metric = metric.RCNNAccMetric()
     cls_metric = metric.RCNNLogLossMetric()
     bbox_metric = metric.RCNNL1LossMetric()
-    key_metric = metric.RCNNKeyAccMetric()
+    # key_metric = metric.RCNNKeyAccMetric()
     eval_metrics = mx.metric.CompositeEvalMetric()
-    for child_metric in [rpn_eval_metric, rpn_cls_metric, rpn_bbox_metric, eval_metric, cls_metric, bbox_metric, key_metric]:
+    #for child_metric in [rpn_eval_metric, rpn_cls_metric, rpn_bbox_metric, eval_metric, cls_metric, bbox_metric, key_metric]:
+    for child_metric in [rpn_eval_metric, rpn_cls_metric, rpn_bbox_metric, eval_metric, cls_metric, bbox_metric]:
         eval_metrics.add(child_metric)
     # callback
     batch_end_callback = callback.Speedometer(train_data.batch_size, frequent=args.frequent)

@@ -7,7 +7,7 @@ eps = 2e-5
 use_global_stats = True
 workspace = 512
 res_deps = {'18': (2, 2, 2, 2), '34': (3, 4, 6, 3), '50': (3, 4, 6, 3), '101': (3, 4, 23, 3), '152': (3, 8, 36, 3), '200': (3, 24, 36, 3)}
-res_type = '34'
+res_type = '18'
 units = res_deps[res_type]
 if res_type != '34' and res_type != '18':
     filter_list = [256, 512, 1024, 2048]
