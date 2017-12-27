@@ -210,11 +210,19 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+def try_gpu(idx=0):
+    """If GPU is available, return mx.gpu(0); else return mx.cpu()"""
+    try:
+        ctx = mx.gpu(idx)
+        _ = mx.nd.array([0], ctx=ctx)
+    except:
+        ctx = mx.cpu(idx)
+    return ctx
 
 def main():
     args = parse_args()
     logger.info('Called with argument: %s' % args)
-    ctx = [mx.gpu(int(i)) for i in args.gpus.split(',')]
+    ctx = [try_gpu(int(i)) for i in args.gpus.split(',')]
     train_net(args, ctx, args.pretrained, args.pretrained_epoch, args.prefix, args.begin_epoch, args.end_epoch,
               lr=args.lr, lr_step=args.lr_step)
 
