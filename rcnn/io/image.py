@@ -41,6 +41,8 @@ def get_image(roidb):
                 pad_size = int(math.ceil(im.shape[0] / 32.) * 32 - im.shape[0])
                 im = cv2.copyMakeBorder(im, 0, pad_size, 0, 0, cv2.BORDER_CONSTANT, value=(0, 0, 0))
 
+        # cv2.imshow("img", im)
+        # cv2.waitKey()
         config.TRAIN.IMAGE_BLOB = im.copy()
 
         im_tensor = transform(im, config.PIXEL_MEANS)

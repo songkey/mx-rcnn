@@ -14,13 +14,13 @@ from rcnn.utils.load_model import load_param
 from rcnn.processing.nms import py_nms_wrapper, cpu_nms_wrapper, gpu_nms_wrapper
 
 
-CLASSES = ('__background__',
-           'aeroplane', 'bicycle', 'bird', 'boat',
-           'bottle', 'bus', 'car', 'cat', 'chair',
-           'cow', 'diningtable', 'dog', 'horse',
-           'motorbike', 'person', 'pottedplant',
-           'sheep', 'sofa', 'train', 'tvmonitor')
-CLASSES = ('__background__', 'person')
+# CLASSES = ('__background__',
+#            'head', 'bicycle', 'bird', 'boat',
+#            'bottle', 'bus', 'car', 'cat', 'chair',
+#            'cow', 'diningtable', 'dog', 'horse',
+#            'motorbike', 'person', 'pottedplant',
+#            'sheep', 'sofa', 'train', 'tvmonitor')
+CLASSES = ('__background__', 'head')
 config.NUM_CLASSES = len(CLASSES)
 config.TEST.HAS_RPN = True
 SHORT_SIDE = config.SCALES[0][0]
@@ -144,14 +144,25 @@ def parse_args():
     parser.add_argument('--epoch', help='epoch of pretrained model', type=int)
     parser.add_argument('--gpu', help='GPU device to use', default=1, type=int)
     parser.add_argument('--vis', help='display result', action='store_true')
+    parser.add_argument('--save_json', help='inference json file', default="network.json", type=str)
     args = parser.parse_args()
     return args
 
 
+def try_gpu(idx=0):
+    """If GPU is available, return mx.gpu(0); else return mx.cpu()"""
+    try:
+        ctx = mx.gpu(idx)
+        _ = mx.nd.array([0], ctx=ctx)
+    except:
+        ctx = mx.cpu(idx)
+    return ctx
+
 def main():
     args = parse_args()
-    ctx = mx.gpu(args.gpu)
+    ctx = try_gpu(args.gpu)
     symbol = eval('get_' + args.network + '_test')(num_classes=config.NUM_CLASSES, num_anchors=config.NUM_ANCHORS)
+    symbol.save(args.save_json)
     predictor = get_net(symbol, args.prefix, args.epoch, ctx)
     demo_net(predictor, args.image, args.vis)
 
