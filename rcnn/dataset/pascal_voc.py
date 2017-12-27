@@ -110,24 +110,34 @@ class PascalVOC(IMDB):
             objs = non_diff_objs
         num_objs = len(objs)
 
-        boxes = np.zeros((num_objs, 4), dtype=np.uint16)
-        gt_classes = np.zeros((num_objs), dtype=np.int32)
-        overlaps = np.zeros((num_objs, self.num_classes), dtype=np.float32)
-
+        boxes = np.zeros((0, 4), dtype=np.uint16)
+        gt_classes_list = []
         class_to_index = dict(zip(self.classes, range(self.num_classes)))
         # Load object bounding boxes into a data frame.
+        obj_num = 0
         for ix, obj in enumerate(objs):
             bbox = obj.find('bndbox')
             # Make pixel indexes 0-based
-            x1 = float(bbox.find('xmin').text) - 1
-            y1 = float(bbox.find('ymin').text) - 1
-            x2 = float(bbox.find('xmax').text) - 1
-            y2 = float(bbox.find('ymax').text) - 1
+            x1 = float(bbox.find('xmin').text)
+            y1 = float(bbox.find('ymin').text)
+            x2 = float(bbox.find('xmax').text)
+            y2 = float(bbox.find('ymax').text)
+            nx1, nx2 = min(x1,x2), max(x1,x2)
+            if nx1 >= nx2 : 
+                print "#####nx1, nx2", nx1, nx2
+                continue
+            ny1, ny2 = min(y1,y2), max(y1,y2)
+            if ny1 >= ny2 : 
+                print "#####ny1, ny2", ny1, ny2
+                continue
             cls = class_to_index[obj.find('name').text.lower().strip()]
-            boxes[ix, :] = [x1, y1, x2, y2]
-            gt_classes[ix] = cls
-            overlaps[ix, cls] = 1.0
 
+            boxes = np.vstack((boxes, np.array([nx1,ny1,nx2,ny2])))
+            gt_classes_list.append(cls)
+            obj_num += 1
+
+        gt_classes = np.array(gt_classes_list, dtype=np.int32)
+        overlaps = np.ones((obj_num, self.num_classes), dtype=np.float32)
         roi_rec.update({'boxes': boxes,
                         'gt_classes': gt_classes,
                         'gt_overlaps': overlaps,
